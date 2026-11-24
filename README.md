@@ -2,9 +2,19 @@
 
 简体中文 · [English](README.en.md)
 
-**Skill 就是一份给 AI 的操作说明。** 这个仓库有三套说明，适合检查 AI 工作流程、第三方 Skill 和 GitHub 代码。第一次使用，可以先把说明文件和要检查的材料交给 AI，再复制下面对应的提示词。
+## 为什么做这个
+
+我的一个客户用了别人分享的 Skill。AI 替他向大量客户发送了垃圾信息，影响了他和不少客户的关系。我用这套审查 Skill 帮他排查并解决了问题。
+
+**开源 ≠ 安全，star 多 ≠ 没坑。装 Skill 或 GitHub 项目之前，先让 AI 只读审一遍。**
+
+**Skill 就是一份给 AI 的操作说明。** 这里有三套只读审查说明，可以用来检查自己写的流程、别人分享的 Skill 和 GitHub 代码。
 
 ## 选哪一套
+
+- 自己写的 Skill → [`person-skill-review`](person-skill-review/)：查逻辑漏洞、权限边界。
+- 外部下载的 Skill → [`skill-security-check`](skill-security-check/)：查提示注入、凭据读取、数据外发。
+- GitHub 项目 → [`github-repo-security-check`](github-repo-security-check/)：查依赖投毒、隐蔽外联、构建脚本风险。
 
 | 你想问什么 | 选哪套 Skill | 它会帮你看什么 |
 | --- | --- | --- |
@@ -12,7 +22,18 @@
 | 别人给我的 Skill 或插件能不能用？ | [`skill-security-check`](skill-security-check/SKILL.md) | 是否会读取密码、上传资料、执行危险命令，或让 AI 按外部指令越权操作。 |
 | GitHub 上的程序或代码有没有安全问题？ | [`github-repo-security-check`](github-repo-security-check/SKILL.md) | 数据泄露、越权访问、注入、恶意依赖、安装与部署风险。 |
 
-## 第一次用：先准备规则文件
+## 30 秒上手
+
+1. 下载后，从上面的速览选一套，把**整个同名目录**复制到 Agent 能读取的位置，保留 `SKILL.md` 和 `references/`。下载方法见下方「怎么用」的第一步。
+2. 把下面两个括号里的内容换成你的信息，再把这句话发给 Agent。
+
+> 请读取【刚复制的规则目录】里的 `SKILL.md` 和 `references/`，按里面的规则只读检查【要审的文件、目录或 GitHub 链接】。告诉我最重要的问题和下一步。不要运行或修改被审内容。
+
+如果填的是公开 GitHub 链接，且你同意联网，再加一句「我授权你为本次审查只读访问这个仓库。」
+
+## 怎么用
+
+### 第一次用：先准备规则文件
 
 1. 在本仓库页面点绿色的 **Code**，再点 **Download ZIP**。到电脑的「下载」文件夹里解压，打开解压后名字以 `agent-skill-check` 开头的文件夹（通常是 `agent-skill-check-main`）。里面有三套规则，文件夹名称和上表一致。 [GitHub 下载帮助](https://docs.github.com/en/repositories/working-with-files/using-files/downloading-source-code-archives)
 2. 打开一个可以读取文件的 AI 对话，点输入框旁的 **＋** 或回形针。把下文列出的**规则文件**先发给 AI，并写一句：「这些是检查规则，请先告诉我你读到了哪些文件。我下一条再发检查对象。」如果不能上传文件，可以打开规则文件，复制全文到对话里。
@@ -20,13 +41,15 @@
 
 如果 AI 已安装了其中一套 Skill，可以在技能列表选中它，再从下面的操作步骤开始。安全审查看私有代码、整个本地目录或 GitHub 链接时，需要合适的文件或联网权限。普通聊天无法读取这些材料时，可以先检查实际收到的文件，并让 AI 列出没看到的部分。请勿把密码、API 密钥或客户资料直接粘贴到聊天里。
 
-## 1. 检查自己写的 Skill
+### 1. 检查自己写的 Skill
 
 **规则文件**：[SKILL.md](person-skill-review/SKILL.md) 和 [completeness-checklist.md](person-skill-review/references/completeness-checklist.md)。
 
 1. 把你写的 Skill 上传。它可能是一份 `SKILL.md`，也可能是一个含参考文件的目录。如果有目录，让能读本地文件的 AI 读取该目录；只想试一下，也可以直接粘贴正文。
 2. 复制以下提示词。填上文件或目录名，再用一句话告诉 AI 你原本想让这个 Skill 做什么。
 3. 点击发送。如果报告说「修正后使用」，先看最重要的三个问题。按建议修改后，把新版本发给 AI 并说「请按上次的问题逐条复查」。
+
+**示例请求（可直接复制）**
 
 ```text
 请按 person-skill-review 的规则检查我写的 Skill。
@@ -38,13 +61,15 @@
 
 **练习例子**：把「旅行清单助手」当作目标，贴一条规则「用户说出目的地后，生成行李清单」。目标填「出发前帮我列行李」。看 AI 是否提醒你说明旅行天数、季节，或者用户没提供这些信息时要怎么做。
 
-## 2. 检查别人给你的 Skill 或插件
+### 2. 检查别人给你的 Skill 或插件
 
 **规则文件**：[SKILL.md](skill-security-check/SKILL.md) 和 [threat-checklist.md](skill-security-check/references/threat-checklist.md)。
 
 1. 如果 Skill 在公开 GitHub 仓库里，复制浏览器地址栏里的仓库或 Skill 文件夹链接，先别安装。如果已经下载，把待审目录路径交给能读取本地文件的 AI，从可信的工作区发起审查。尽量提供整个目录；只发一个 `SKILL.md` 时，AI 只能对看到的正文作判断。
 2. 复制以下提示词，把 `【填目标】` 换成链接或目录。若是公开 GitHub 链接、且你允许这次联网读它，保留联网授权那一行；本地审查可以删掉该行。
 3. 看报告开头。如果写着「禁止安装」或「需人工复核」，先停下，问 AI「我需要补哪个文件，或先处理哪条风险？」如果建议可以安装，先核对安装对象是否与报告写的版本一致。
+
+**示例请求（可直接复制）**
 
 ```text
 请按 skill-security-check 的规则做安装前安全审查。
@@ -56,13 +81,15 @@
 
 **练习例子**：目标填「下面粘贴的一小段 Skill 正文」，在提示词最后加一行「整理我提供的待办事项」。即使这段话没有明显问题，也应得到「只审了这份正文，不能放行整包」的结论。
 
-## 3. 检查 GitHub 代码仓库
+### 3. 检查 GitHub 代码仓库
 
 **规则文件**：[SKILL.md](github-repo-security-check/SKILL.md)、[repo-threat-checklist.md](github-repo-security-check/references/repo-threat-checklist.md) 和 [search-patterns.md](github-repo-security-check/references/search-patterns.md)。
 
 1. 打开想检查的 GitHub 项目，复制项目首页链接。已经在电脑上的项目，可以给会读取本地文件的 AI 提供目录路径。知道分支或提交编号就一起给；不知道可以写「请先告诉我你能审到哪个版本」。
 2. 复制以下提示词，填好目标和重点。私有项目使用已授权的本地目录或连接，访问受限时可以先检查获准提供的材料。
 3. 报告出来后，先看「最终判决」和「审计盲区」（没检查到或无法确认的范围）。有高危风险先处理；还没看全时，问「要补看哪些目录、依赖或配置？」如果项目同时带有会加载的 Skill、插件或代理配置，请让 AI 对**同一版本**补做第 2 套审查。
+
+**示例请求（可直接复制）**
 
 ```text
 请按 github-repo-security-check 的规则做只读安全审查。
@@ -78,3 +105,5 @@
 ## 审查边界
 
 这些 Skill 用于静态审查，也就是读材料、找证据。报告只适用于写明的版本和范围。实际运行时会不会外发数据、生产环境权限是否有效，需要另行验证。
+
+如果它帮你避过一次坑，欢迎点个 ⭐ Star，也欢迎提 Issue 分享你遇到的可疑 Skill。
